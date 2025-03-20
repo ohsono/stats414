@@ -172,7 +172,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-/Lectures/*
 /Papers/*
 /Data/*
-/HW/*
