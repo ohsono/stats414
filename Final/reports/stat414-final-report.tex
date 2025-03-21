@@ -1,0 +1,215 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{colortbl}
+\usepackage{authblk}  % For better author formatting
+\usepackage{hyperref} % For clickable links in PDF
+\usepackage{xcolor}   % For colored text
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Code}{Verbatim}{breaklines=true}
+\geometry{margin=1in}
+
+% UCLA STATS-414-W25
+
+\title{Predictive \& Generative AI for Digital Marketing Data}
+
+\author[1]{Hochan Son}
+\author[1]{Stephanie Lu}
+\author[1]{Ashwin Ramaseshanar}
+\author[1]{Juyi Yang}
+\affil[1]{University of California, Los Angeles}
+
+\renewcommand\Authands{, }
+\renewcommand\Affilfont{\small\texttt}
+\date{March 21, 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\texttt{hochanson@ucla.edu, stephaniehlu@g.ucla.edu, ama035@g.ucla.edu, juyiyang30@g.ucla.edu}
+\end{center}
+
+\begin{abstract}
+Generative AI models have emerged as powerful tools for synthesizing data that closely mimics real-world datasets, preserving critical statistical properties and addressing challenges like data imbalance and privacy. This project explores generative models—TabDDPM, CTGAN, TVAE, and LLMs—for digital marketing datasets containing user engagement information. We evaluated each model's performance in terms of fidelity, utility, and computational efficiency. Our findings indicate that, in general, CTGAN shows superior performance in capturing realistic distributions and improving predictive accuracy.
+\end{abstract}
+
+\section{Introduction}
+Synthetic data generation provides solutions to enhance concerns about data scarcity, imbalance, and privacy inherent in real-world datasets. This project uses generative AI to produce synthetic digital marketing data, with the objective of improving ad targeting, campaign optimization, and model generalization in the long run.
+
+\section{Methods}
+There are various well-known methods among many effective Generative methods. We particularly drawn to few AI models, which has covered in the class, such as TabDDPM, CTGAN, TVAE, and LLMs (GPT-2). To give a glance of summary of the benefis of those Generative AI models,
+\begin{itemize}
+\item \textbf{TabDDPM}: Employs diffusion processes to iteratively generate realistic tabular data.
+\item \textbf{CTGAN}: A GAN designed specifically for tabular data, simultaneously training a generator and discriminator.
+\item \textbf{TVAE}: Utilizes variational autoencoders tailored for tabular data, capturing complex feature dependencies.
+\item \textbf{LLMs (GPT-2)}: Fine-tuned language models based on GPT-2 to adapt tabular data format generation. 
+\end{itemize}
+
+The original dataset was huge we worried that using the entire dataset will cause some resource challenges for training and evaulating the model outcomes. Therefore, to fit into the local resource, we restricted to train the AI models using only representative 10\% subset of real user engagement data with combining the new generative tabular dataset to fix the imbalance issues. Then, we also evaluate the dataset with involved statistical metrics such as fidelity and utility metrics to benchmark performance.
+\subsection{CTGAN}
+somethingsomethingsomethingsomethingsomethingsomethingsomethingsomethingsomething
+\subsection{TVAE}
+\subsubsection[short]{Introduction}
+
+Tabular Variational Autoencoder (TVAE) is a deep learning-based generative model designed specifically for tabular datasets. Unlike traditional generative models, TVAE employs variational inference to learn a realistic representation of the data, allowing it to encode complex relationships between numerical and categorical features. This capability makes TVAE particularly useful in generating high-quality synthetic data that preserves the statistical properties of the original dataset while ensuring diversity. 
+
+The objective was to assess the fidelity of the generated data, meaning how closely it resembles real data, as well as its utility in downstream machine learning tasks. The dataset was sampled down to 10\% of the original data for computational efficiency, and categorical variables were factorized into numerical representations. StandardScaler was applied to normalize numerical features before training the TVAE model. 
+
+\subsubsection[short]{Methodology}
+
+The TVAE model architecture consists of an encoder with two hidden layers of 32 units each, followed by a latent space of 16 dimensions, and a decoder that reconstructs the original input from this compressed representation. The model was trained using Mean Squared Error (MSE) loss function for 50 epochs. Training was conducted on the sampled and normalized dataset, and loss values were monitored to ensure convergence. Once the model was trained, it was used to generate synthetic samples, ensuring that the synthetic data reflected the distribution of the original dataset.
+
+To align with the structure of the real dataset, we carefully managed the synthetic data generation process. The number of synthetic samples per class was 30\% for the dominant class, while 100,000 synthetic rows were explicitly generated for the secondary label. To ensure data consistency, labels were corrected so that they only took values of 0 and 1, preventing any unexpected numerical outputs.
+
+\subsubsection[short]{Results and Analysis}
+
+To evaluate the fidelity of the synthetic dataset, we conducted several statistical tests comparing the real and synthetic data distributions. The Kolmogorov-Smirnov (KS) test was used to measure the similarity between distributions, yielding a KS statistic of 97.03\% for TVAE and 6.05\% for CTGAN. Since a lower KS statistic indicates higher fidelity, CTGAN demonstrated significantly better performance in maintaining the distributional characteristics of the real data.
+
+Jensen-Shannon (JS) divergence was computed to measure probability distribution overlap, with TVAE achieving 82.45\% compared to CTGAN’s 4.92\%. A lower JS divergence value suggests better similarity to the real data, further supporting CTGAN’s superiority in fidelity.
+
+For utility analysis, machine learning models were trained on the synthetic datasets to evaluate their effectiveness in predictive modeling. The Mean Absolute Error (MAE) was lowest for CTGAN (0.195), while TVAE had 0.265, indicating that CTGAN-generated data was numerically closer to real data. When training an XGBoost classifier, CTGAN achieved the highest accuracy (0.805) and precision (0.898), whereas TVAE excelled in recall (0.749). However, the F1-score, which balances precision and recall, was highest for LLM-GPT2 (0.777), followed by CTGAN (0.762) and TVAE (0.736). These results suggest that while TVAE captures some meaningful patterns, it does not generalize as well as CTGAN for predictive tasks.
+
+\subsubsection[short]{Conclusion and Future Work}
+
+TVAE was successfully implemented to generate synthetic advertising data, demonstrating moderate success in preserving real data characteristics. However, the evaluation results suggest that CTGAN consistently outperformed TVAE in both fidelity and utility, particularly in statistical similarity and predictive modeling performance. TVAE’s high KS statistic (97.03\%) and JS divergence (82.45\%) indicate that its generated data deviated significantly from the real distribution. Additionally, its MAE (0.265) was higher than CTGAN’s, meaning the generated values were less accurate numerically.
+
+Despite these limitations, TVAE exhibited strong recall performance (0.749) in classification tasks, making it useful for scenarios requiring high sensitivity to positive cases. However, its potential overfitting, suggested by fidelity results, raises concerns regarding privacy preservation and generalizability.
+
+Future work should explore hyperparameter tuning to improve TVAE’s ability to learn real-world distributions without overfitting. Additionally, hybrid approaches combining TVAE with CTGAN could leverage the strengths of both models to enhance synthetic data quality. Further research should also assess adversarial risks to ensure that synthetic datasets remain privacy-compliant while retaining their predictive power.
+
+
+\subsection{LLM (Fine-Tuned GPT-2 for Tabular Data)}
+
+\subsubsection[short]{Model Architecture}
+Our framework utilizes the GPT-2 model architecture, a transformer-based language model with a decoder-only structure. The model consists of multiple transformer blocks, each containing a multi-headed self-attention mechanism and a feed-forward neural network. For a given input sequence of tokens, the model predicts the next token in the sequence, which we leverage to generate synthetic tabular data.
+
+The standard GPT-2 architecture is augmented with additional vocabulary tokens for our tabular data representation. Formally, the model computes:
+
+\begin{equation}
+P(s_t | s_{<t}) = \text{softmax}(h_t W^T)
+\end{equation}
+
+where $h_t$ is the final hidden state corresponding to the $t$-th token, and $W$ is the token embedding matrix.
+\subsubsection[short]{Training procesure}
+The model is trained using a standard language modeling objective, minimizing the negative log-likelihood of the observed token sequences:
+
+\begin{equation}
+\mathcal{L} = -\sum_{t=1}^{l} \log P(s_t | s_{<t})
+\end{equation}
+
+where $l$ is the length of the token sequence.
+
+To accommodate various computational environments, our framework dynamically adjusts training parameters based on available resources. For high-performance environments with GPUs, we use larger batch sizes (4) and learning rates (5e-5). For environments with limited computational resources like standard CPUs, we reduce batch sizes (1) and learning rates (3e-5) to ensure stable training.
+
+\subsubsection[short]{Special Tokens}
+The special tokens used in the our model create a structured representation of tabular data that allows transformer models to understand and generate data with the correct relationships between fields. Here's a summary of these special tokens and their roles:
+\begin{itemize}
+\item Structural Tokens:
+\end{itemize}
+\begin{enumerate}
+        \item \texttt{<ROW>} - Marks the beginning of a new row in the dataset. This signals to the model that a new record is starting.
+        \item \texttt{<ENDROW>} - Marks the end of a row. This helps the model understand where one record ends and another begins.
+        \item \texttt{<COL>} - Indicates the start of a column entry. This is followed by the column name.
+        \item \texttt{<ENDCOL>} - Marks the end of a column entry. This creates a clear boundary between different fields in the same row.
+\end{enumerate}
+\begin{itemize}
+\item DataType Tokens:
+\end{itemize}
+\begin{enumerate}
+        \item \texttt{<NUM>} - Signals that the following value is numerical. This helps the model learn appropriate distributions for continuous or discrete numerical values.
+        \item \texttt{<CAT>} - Indicates that the following value is categorical. This helps the model understand that these values come from a finite set of possibilities.
+        \item \texttt{<LIST>} - Denotes that the following value is a list-type field, typically containing multiple values separated by delimiters like "\^". This helps the model handle more complex data structures.
+\end{enumerate}
+\begin{itemize}
+\item Special Purpose Token:
+\end{itemize}
+\begin{enumerate}
+        \item \texttt{<PAD>} - Used as padding to ensure all sequences have the same length during batch processing. This is not part of the data representation but is necessary for efficient model training.
+\end{enumerate}
+
+These tokens work together to create a structured sequence that might look like:
+
+\begin{table}[!ht]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{Code}
+                        <ROW>
+                        <COL>age<NUM>32<ENDCOL>
+                        <COL>gender<CAT>female<ENDCOL>
+                        <COL>interests<LIST>sports^reading^travel<ENDCOL>
+                        <ENDROW>
+\end{Code}
+\caption{Example of special tokens for tabular data}
+\label{tab:special_tokens}
+\end{table}
+
+The tokenization strategy employed in this model offers several significant advantages that work together to enable effective tabular data modeling. By preserving the inherent tabular structure within a sequential format that transformers can process, this approach allows the model to understand the two-dimensional nature of data tables while working within the constraints of sequence-based architectures. The explicit encoding of column names maintains the crucial relationship between field identifiers and their values, ensuring semantic consistency across generated records. Furthermore, the differentiation between data types through specialized tokens helps the model learn appropriate statistical distributions and patterns specific to numerical, categorical, and list-type values. Perhaps most importantly, this structured tokenization creates a consistent grammatical framework that the model can internalize during training and then faithfully reproduce when generating new synthetic data, resulting in outputs that maintain both the format and statistical properties of the original dataset.
+
+
+\subsubsection[short]{Data Preprocessing}
+
+\subsubsection[short]{Generation procedure}
+To generate synthetic data, we start with a \texttt{<ROW>} token and sample subsequent tokens autoregressively. The generation process incorporates temperature sampling ($T=0.8$) to balance between creativity and faithfulness to the original data distribution. Generated sequences are parsed to extract structured tabular data, with type-specific post-processing to ensure valid values for each column.
+
+\subsubsection[short]{Evaluation procedure}
+\subsection{TabDDPM}
+somethingsomethingsomethingsomethingsomethingsomethingsomethingsomethingsomething
+
+
+\section{Data}  
+
+\section{Model Evaluation}
+We also have measured the model performance metrics with respect to Fidelity and utility which are summarized as below table \ref{tab:fidelity} and table \ref{tab:utility}.
+
+For Fidelity metrics, we have used Overall Fidelity, Kolmogorov-Smirnov (KS) Test, and Jensen-Shannon (JS) Divergence. For Utility metrics, we have used Mean Absolute Error (MAE), Accuracy, Precision, Recall, and F1-Score.
+\begin{table}[!ht]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Metric} & \textbf{Baseline} & \textbf{TVAE} & \textbf{CTGAN} & \textbf{LLM-GPT2} & \textbf{BestModel}\\ \hline
+Overall Fidelity (\textit{Higher} is better) & 100\% & 25.66\% & 94.51\% & 79.19\% & CTGAN \\ \hline
+KS Test (\textit{Lower} is better) & 0\% & 97.03\% & 6.05\% & 11.65\% & CTGAN \\ \hline
+JS Divergence (\textit{Lower} is better) & 0\% & 82.45\% & 4.92\% & 29.96\% & CTGAN \\ \hline
+\end{tabular}
+\caption{Model Performance Evaluation (Fidelity Metrics)}
+\label{tab:fidelity}
+\end{table}
+
+For the utility metrics, we have used Mean Absolute Error (MAE), Accuracy, Precision, Recall, and F1-Score. The results are summarized in the below table \ref{tab:utility}.
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\rowcolor[gray]{0.9}
+\textbf{Metrics} & \textbf{Baseline} & \textbf{TVAE} & \textbf{CTGAN} & \textbf{LLM-GPT2} & \textbf{Best} \\ \hline
+MAE (\textit{Lower} is better) & 0.267 & 0.265 & 0.195 & 0.209 & CTGAN \\ \hline
+Accuracy (\textit{Higher} is better) & 0.733 & 0.735 & 0.805 & 0.791 & CTGAN \\ \hline
+Precision (\textit{Higher} is better) & 0.596 & 0.723 & 0.898 & 0.884 & CTGAN \\ \hline
+Recall (\textit{Higher} is better) & 0.225 & 0.749 & 0.662 & 0.694 & TVAE \\ \hline
+F1-Score (\textit{Higher} is better) & 0.327 & 0.736 & 0.762 & 0.777 & LLM \\ \hline
+\end{tabular}
+\caption{Model Performance Evaluation (Utility Metrics)}
+\label{tab:utility}
+\end{table}
+
+As a result of Evaluation with Kolmogorov-Smirnov (KS) Test, Jensen-Shannon (JS) Divergence, we find out which models are the best in terms of Mean Absolute Error (MAE), and predictive performance metrics such as accuracy, precision, recall, and F1-score.
+
+Based on the testing, we have concluded that "CTGAN" has consistently outperformed other models, showing superior fidelity (KS=0.204, JS=4.92\%) and utility (MAE=0.195, Accuracy=0.805, Precision=0.898). TVAE performed best in recall, while LLMs showed moderate results in precision and F1-score.
+
+\section{Discussion}
+CTGAN's robust performance suggests it is highly suitable for digital marketing datasets characterized by mixed data types and complex dependencies. However, CTGAN often faces challenges like mode collapse and class imbalance. TVAE and LLMs demonstrated promise but were constrained by computational resource demands and data dimensionality issues.
+
+\section{Implications}
+Synthetic data from generative AI can significantly enhance machine learning model training, mitigate biases, and reduce privacy risks by allowing safe data sharing. However, synthetic data generation requires careful management to avoid amplifying existing biases.
+
+\section{Conclusion and Next Steps}
+Future work will focus on hyperparameter optimization for existing models, exploration of advanced generative methods, bias evaluation, and testing hybrid real-synthetic datasets. Evaluating synthetic data's impact on downstream tasks such as click-through rate (CTR) prediction and differential privacy remains crucial.
+
+\end{document}
